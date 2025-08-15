@@ -89,6 +89,3 @@ Para poner en marcha el proyecto en un entorno de desarrollo local, sigue estos 
 
 ---
 
-### **👤 AUTOR**
-
-*   **Javier Quiroz** - *Desarrollador Principal*
