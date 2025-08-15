@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="public/images/logo_completo.png" alt="CyberPharma Logo" width="200"/>
   <h1><strong>CyberPharma - Sistema de Gestión para Droguerías</strong></h1>
+  <img src="public/images/logo_completo.png" alt="CyberPharma Logo" width="200"/>
 </div>
 
 ---
