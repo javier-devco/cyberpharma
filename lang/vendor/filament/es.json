@@ -1,0 +1,22 @@
+{
+    "actions.view_any": "Ver listado de :resource",
+    "actions.view": "Ver :resource",
+    "actions.create": "Crear :resource",
+    "actions.update": "Editar :resource",
+    "actions.delete": "Borrar :resource",
+    "actions.delete_any": "Borrar múltiples :resource",
+
+    "resources.panel": "Panel de Administración",
+    "resources.alerta": "Alertas",
+    "resources.compra": "Compras",
+    "resources.estado": "Estados",
+    "resources.factura": "Facturas",
+    "resources.medida_producto": "Medidas de Productos",
+    "resources.pedido": "Pedidos",
+    "resources.producto": "Productos",
+    "resources.proveedor": "Proveedores",
+    "resources.role": "Roles",
+    "resources.user": "Usuarios",
+    "resources.venta": "Ventas",
+    "resources.inventario": "Inventario"
+}
