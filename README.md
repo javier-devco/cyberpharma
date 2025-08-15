@@ -1,61 +1,98 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# CyberPharma - Sistema de Gestión para Droguerías
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+![CyberPharma Logo](public/images/logo_completo.png)
 
-## About Laravel
+## INTRODUCCIÓN
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+**CyberPharma** es un sistema de gestión de inventario y ventas diseñado específicamente para droguerías y farmacias. Desarrollado sobre **Laravel** y potenciado por el panel de administración **FilamentPHP**, esta aplicación ofrece una solución robusta, rápida y totalmente en español para el control total de tu negocio.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+El sistema está construido sobre un potente sistema de **Roles y Permisos** basado en `spatie/laravel-permission`, permitiendo una gestión segura y granular del acceso para diferentes tipos de usuarios (Administrador, Vendedor, Bodeguista, etc.).
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## CARACTERÍSTICAS PRINCIPALES
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+✅ **Autenticación Segura:** Sistema de inicio de sesión por roles con control de acceso al panel.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+✅ **Gestión de Roles y Permisos Visual:** Interfaz de administración para crear roles y asignar permisos a cada módulo (ver, crear, editar, borrar) sin tocar una línea de código.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+✅ **Dashboard Inteligente:**
+- **Indicadores Clave (KPIs):** Alertas de bajo stock y productos próximos a vencer en tiempo real.
+- **Métricas de Negocio:** Conteo de compras e ingresos totales del mes.
+- **Análisis Visual:** Gráfico de ventas de la última semana y tabla de actividad de ventas reciente.
 
-## Laravel Sponsors
+✅ **Módulos de Gestión Completos (CRUDs):**
+- **Administración:** Gestión completa de Usuarios y sus Roles.
+- **Inventario:** Log detallado de cada movimiento de stock (entradas por compra, salidas por venta, ajustes manuales).
+- **Productos:** Control total sobre el catálogo de productos, incluyendo proveedor, stock, lote y fecha de vencimiento.
+- **Transacciones:** Módulos para registrar Ventas, Compras, Pedidos a proveedores y Facturas asociadas.
+- **Catálogos:** Gestión centralizada de Proveedores, Estados (para pedidos y alertas) y Medidas de Productos.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+✅ **Lógica de Negocio Automatizada:**
+- El **stock se actualiza automáticamente** al registrar una venta, una compra o un pedido recibido.
+- Los **formularios de venta son reactivos**: el precio se autocompleta y el total se calcula en tiempo real.
 
-### Premium Partners
+✅ **Exportación de Datos:** Funcionalidad para exportar listados de Ventas, Facturas e Inventario a **Excel y PDF**.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+---
 
-## Contributing
+## INSTALACIÓN
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Para poner en marcha el proyecto en un entorno de desarrollo local, sigue estos pasos:
 
-## Code of Conduct
+1.  Clona el repositorio:
+    ```bash
+    git clone https://github.com/javier-devco/cyberpharma.git
+    ```
+2.  Navega al directorio del proyecto:
+    ```bash
+    cd cyberpharma
+    ```
+3.  Instala las dependencias de PHP:
+    ```bash
+    composer install
+    ```
+4.  Instala las dependencias de Frontend:
+    ```bash
+    npm install
+    ```
+5.  Crea una copia del archivo de entorno:
+    ```bash
+    cp .env.example .env
+    ```
+6.  Genera la clave de la aplicación:
+    ```bash
+    php artisan key:generate
+    ```
+7.  Configura tu base de datos en el archivo `.env`.
+8.  Ejecuta las migraciones y llena la base de datos con datos de prueba:
+    ```bash
+    php artisan migrate:fresh --seed
+    ```
+9.  Compila los archivos de frontend:
+    ```bash
+    npm run build
+    ```
+10. Lanza el servidor de desarrollo:
+    ```bash
+    php artisan serve
+    ```
+11. ¡Listo! Accede a `http://127.0.0.1:8000` en tu navegador.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+## TECNOLOGÍAS UTILIZADAS
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+*   **Framework Principal:** Laravel
+*   **Panel de Administración:** FilamentPHP
+*   **Base de Datos:** MySQL
+*   **Frontend:** Tailwind CSS, Alpine.js, Vite
+*   **Paquetes Clave:**
+    *   `spatie/laravel-permission`: Para la gestión de roles y permisos.
+    *   `pxlrbt/filament-excel`: Para la exportación de datos.
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## AUTOR
+
+*   **Javier Quiroz** - *Desarrollador Principal*
