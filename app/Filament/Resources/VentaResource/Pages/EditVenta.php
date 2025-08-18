@@ -18,6 +18,7 @@ class EditVenta extends EditRecord
     }
 
     /**
+     * ¡LÓGICA CORREGIDA!
      * Este método se ejecuta DESPUÉS de que los cambios en la Venta han sido guardados.
      */
     protected function afterSave(): void
@@ -33,11 +34,6 @@ class EditVenta extends EditRecord
         $venta->save();
     }
 
-    /**
-     * ¡CÓDIGO AÑADIDO!
-     * Sobrescribe el comportamiento por defecto y fuerza la redirección
-     * a la página de listado (index) después de guardar los cambios.
-     */
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');

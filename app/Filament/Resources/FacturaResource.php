@@ -3,13 +3,13 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\FacturaResource\Pages;
+use App\Filament\Resources\FacturaResource\RelationManagers;
 use App\Models\Factura;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction; // <-- ¡PASO 1: AÑADE ESTE 'use'!
 
 class FacturaResource extends Resource
 {
@@ -23,12 +23,24 @@ class FacturaResource extends Resource
 
     public static function form(Form $form): Form
     {
-        // ... (El formulario no cambia)
         return $form
             ->schema([
-                Forms\Components\Select::make('id_venta')->label('Venta Asociada (ID)')->relationship('venta', 'id_venta')->searchable()->required(),
-                Forms\Components\DateTimePicker::make('fecha_emision')->label('Fecha de Emisión')->required()->default(now()),
-                Forms\Components\TextInput::make('total_compra')->label('Total Facturado')->numeric()->prefix('$ ')->required(),
+                Forms\Components\Select::make('id_venta')
+                    ->label('Venta Asociada (ID)')
+                    ->relationship('venta', 'id_venta')
+                    ->searchable()
+                    ->required(),
+
+                Forms\Components\DateTimePicker::make('fecha_emision')
+                    ->label('Fecha de Emisión')
+                    ->required()
+                    ->default(now()),
+
+                Forms\Components\TextInput::make('total_compra')
+                    ->label('Total Facturado')
+                    ->numeric()
+                    ->prefix('$ ')
+                    ->required(),
             ]);
     }
 
@@ -45,21 +57,25 @@ class FacturaResource extends Resource
             ->filters([
                 //
             ])
+            // --- SECCIÓN CORREGIDA ---
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make(), // <-- ¡ACCIÓN DE BORRAR AÑADIDA!
             ])
-            // --- ¡SECCIÓN MODIFICADA! ---
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                    ExportBulkAction::make(), // <-- ¡AQUÍ ESTÁ LA LÍNEA AÑADIDA!
                 ]),
             ]);
     }
 
-    // ... (El resto de los métodos no cambian)
-    public static function getRelations(): array { return []; }
+    public static function getRelations(): array
+    {
+        return [
+            RelationManagers\VentaProductosRelationManager::class,
+        ];
+    }
+
     public static function getPages(): array
     {
         return [

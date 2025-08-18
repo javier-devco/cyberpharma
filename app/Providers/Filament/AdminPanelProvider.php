@@ -18,6 +18,10 @@ use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
+// --- PASO 1: IMPORTAR EL PLUGIN ---
+// Añade esta línea al principio, con los otros "use".
+use Filament\SpatieLaravelPermissionPlugin\SpatieLaravelPermissionPlugin;
+
 class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
@@ -26,17 +30,11 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login() // Asegúrate de tener la página de login
+            ->login()
             ->colors([
-                'primary' => Color::Amber, // Usar la clase Color es más robusto
-                // 'primary' => '#FFC107', // Tu versión también es válida
+                'primary' => Color::Amber,
             ])
-
-            // --- TU LÍNEA AÑADIDA, EN EL LUGAR CORRECTO ---
-            // Le decimos a Filament que renderice nuestra vista de Blade en el pie de página.
             ->footer(view('partials.footer'))
-
-            // Descubre y registra automáticamente los Recursos, Páginas y Widgets.
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -44,11 +42,9 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                // Widgets\AccountWidget::class, // Puedes descomentar si lo necesitas
-                // Widgets\FilamentInfoWidget::class, // Puedes descomentar si lo necesitas
+                // Widgets\AccountWidget::class,
+                // Widgets\FilamentInfoWidget::class,
             ])
-
-            // Middlewares estándar de Laravel y Filament.
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -62,6 +58,12 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+            ])
+
+            // --- PASO 2: REGISTRAR EL PLUGIN ---
+            // Añade este bloque de código al final de la configuración del panel.
+            ->plugins([
+                SpatieLaravelPermissionPlugin::make()
             ]);
     }
 }

@@ -10,17 +10,25 @@ class Estado extends Model
     use HasFactory;
 
     /**
-     * The attributes that are mass assignable.
+     * El nombre de la tabla asociada con el modelo.
+     *
+     * @var string
+     */
+    protected $table = 'estados';
+
+    /**
+     * La clave primaria asociada con la tabla.
+     *
+     * @var string
+     */
+    protected $primaryKey = 'id_estado';
+
+    /**
+     * Los atributos que se pueden asignar masivamente.
      *
      * @var array<int, string>
      */
     protected $fillable = [
         'nombre_estado',
     ];
-
-    /**
-     * Especifica el nombre correcto de la tabla y la clave primaria.
-     */
-    protected $primaryKey = 'id_estado';
-    protected $table = 'estados';
-} // <-- ¡AQUÍ ES DONDE DEBE TERMINAR LA CLASE!
+}

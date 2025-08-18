@@ -8,85 +8,47 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Str;
 
 class RoleResource extends Resource
 {
     protected static ?string $model = Role::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-key';
+    // --- TRADUCCIONES ---
     protected static ?string $modelLabel = 'Rol';
-    protected static ?string $pluralModelLabel = 'Roles y Permisos';
+    protected static ?string $pluralModelLabel = 'Roles';
+    protected static ?string $navigationLabel = 'Roles y Permisos';
+    protected static ?string $navigationIcon = 'heroicon-o-key';
     protected static ?string $navigationGroup = 'Administración';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->label('Nombre del Rol')
-                    ->required()
-                    ->unique(ignoreRecord: true),
+                Forms\Components\Section::make()
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->label('Nombre del Rol')
+                            ->required()
+                            ->maxLength(255)
+                            ->unique(ignoreRecord: true),
+                    ]),
 
                 Forms\Components\Section::make('Permisos')
-                    ->schema(self::generatePermissionSections()),
+                    ->schema([
+                        Forms\Components\Toggle::make('acceso_panel_admin')
+                            ->label('Permitir acceso al panel de administración')
+                            ->helperText('Si esta opción está desactivada, los usuarios con este rol no podrán iniciar sesión.')
+                            ->onColor('success')
+                            ->offColor('danger'),
+
+                        Forms\Components\Card::make()
+                            ->schema(static::getPermissionsSchema())
+                            ->columns(4),
+                    ]),
             ]);
-    }
-
-    private static function generatePermissionSections(): array
-    {
-        $sections = [];
-        $actions = ['view_any', 'delete_any', 'view', 'create', 'update', 'delete'];
-
-        $permissions = Permission::all()->groupBy(function ($permission) use ($actions) {
-            if ($permission->name === 'access_panel') {
-                return 'panel';
-            }
-            foreach ($actions as $action) {
-                if (Str::startsWith($permission->name, $action . '_')) {
-                    return Str::after($permission->name, $action . '_');
-                }
-            }
-            return 'general';
-        });
-
-        if (isset($permissions['panel'])) {
-            $sections[] = Forms\Components\Section::make(trans('resources.panel'))
-                ->schema([
-                    Forms\Components\CheckboxList::make('panel')
-                        ->label('Acciones Permitidas')
-                        ->options($permissions['panel']->pluck('name', 'name')->mapWithKeys(function ($name) {
-                            return [$name => 'Permitir acceso al panel de administración'];
-                        }))
-                        ->columns(1),
-                ]);
-        }
-
-        foreach ($permissions as $resource => $permissionGroup) {
-            if (in_array($resource, ['general', 'panel'])) continue;
-
-            $sections[] = Forms\Components\Section::make(trans('resources.' . $resource))
-                ->schema([
-                    Forms\Components\CheckboxList::make($resource)
-                        ->label('Acciones Permitidas')
-                        ->options($permissionGroup->pluck('name', 'name')->mapWithKeys(function ($name) use ($actions) {
-                            $actionName = '';
-                            foreach ($actions as $action) {
-                                if (Str::startsWith($name, $action . '_')) {
-                                    $actionName = $action;
-                                    break;
-                                }
-                            }
-                            return [$name => trans('actions.' . $actionName)];
-                        }))
-                        ->columns(4)
-                        ->bulkToggleable(),
-                ])
-                ->collapsible();
-        }
-        return $sections;
     }
 
     public static function table(Table $table): Table
@@ -94,23 +56,70 @@ class RoleResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')->label('Rol')->searchable(),
-                Tables\Columns\TextColumn::make('created_at')->label('Fecha Creación')->dateTime()->sortable(),
+                Tables\Columns\TextColumn::make('created_at')->label('Fecha Creación')->dateTime('d/m/Y H:i:s'),
             ])
-            ->filters([])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]); // <-- ¡EL PUNTO Y COMA FALTANTE ESTABA AQUÍ!
+            ]);
     }
 
-    public static function getRelations(): array
+    protected static function getPermissionsSchema(): array
     {
-        return [];
+        $selectAll = Forms\Components\Checkbox::make('select_all')
+            ->label('Seleccionar todos')
+            ->afterStateUpdated(function ($state, callable $set) {
+                $permissions = Permission::pluck('name')->toArray();
+                foreach ($permissions as $permission) {
+                    $set($permission, $state);
+                }
+            })
+            ->dehydrated(false);
+
+        $permissionCheckboxes = Permission::all()->map(function ($permission) {
+            return Forms\Components\Checkbox::make($permission->name)
+                ->label(self::translatePermission($permission->name));
+        })->all();
+
+        return array_merge([$selectAll], $permissionCheckboxes);
+    }
+
+    /**
+     * --- ¡NUEVA FUNCIÓN DE TRADUCCIÓN MEJORADA! ---
+     */
+    protected static function translatePermission(string $permissionName): string
+    {
+        // Diccionario de traducciones
+        $translations = [
+            'view_any' => 'Ver listado de',
+            'view' => 'Ver',
+            'create' => 'Crear',
+            'update' => 'Actualizar',
+            'delete' => 'Eliminar',
+            'acceso_panel_admin' => 'Acceso al Panel Admin',
+            'producto' => 'Producto',
+            'venta' => 'Venta',
+            'compra' => 'Compra',
+            'proveedor' => 'Proveedor',
+            'usuario' => 'Usuario',
+            'rol' => 'Rol',
+        ];
+
+        // Caso especial para la llave maestra
+        if ($permissionName === 'acceso_panel_admin') {
+            return $translations['acceso_panel_admin'];
+        }
+
+        // Separa la acción del modelo (ej. 'view_any', 'producto')
+        $parts = explode('_', $permissionName);
+        $actionKey = $parts[0] . (isset($parts[1]) && $parts[1] === 'any' ? '_any' : '');
+        $modelKey = end($parts);
+
+        // Traduce la acción y el modelo usando el diccionario
+        $translatedAction = $translations[$actionKey] ?? Str::title($actionKey);
+        $translatedModel = $translations[$modelKey] ?? Str::title($modelKey);
+
+        return $translatedAction . ' ' . $translatedModel;
     }
 
     public static function getPages(): array

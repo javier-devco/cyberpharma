@@ -10,7 +10,11 @@ use Illuminate\Support\Facades\Route;
 
 class RouteServiceProvider extends ServiceProvider
 {
-    public const HOME = '/dashboard'; // Asegúrate de que apunte a tu panel
+    /**
+     * La ruta a tu "home" para la aplicación.
+     * Se usa por el middleware de Autenticación para redirigir.
+     */
+    public const HOME = '/dashboard';
 
     public function boot(): void
     {

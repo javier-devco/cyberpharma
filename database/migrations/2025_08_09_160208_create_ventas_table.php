@@ -24,7 +24,10 @@ return new class extends Migration
 
             // --- Resto de las columnas ---
             $table->dateTime('fecha_hora');
-            $table->decimal('total_venta', 10, 2);
+
+            // --- ¡LÍNEA MODIFICADA! ---
+            // Le añadimos ->nullable() para permitir que se cree la venta sin un total inicial.
+            $table->decimal('total_venta', 10, 2)->nullable();
 
             $table->timestamps();
         });

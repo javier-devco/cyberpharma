@@ -4,23 +4,28 @@ namespace App\Observers;
 
 use App\Models\Compra;
 use App\Models\Producto;
+use App\Models\Inventario; // <-- Añadimos el modelo Inventario
 
 class CompraObserver
 {
-    /**
-     * Se ejecuta después de que una Compra ha sido creada.
-     */
     public function created(Compra $compra): void
     {
-        // Buscamos el producto correspondiente en el inventario
         $producto = Producto::find($compra->id_producto);
 
-        // Si el producto existe, actualizamos su stock
         if ($producto) {
-            $producto->cantidad_stock += $compra->cantidad; // Sumamos la cantidad comprada
-            $producto->save(); // Guardamos el cambio en la base de datos
+            // 1. Sumamos el stock (esto ya lo teníamos)
+            $producto->cantidad_stock += $compra->cantidad;
+            $producto->save();
+
+            // 2. ¡NUEVO! Creamos el registro en el inventario
+            Inventario::create([
+                'id_producto' => $compra->id_producto,
+                'id_usuario' => auth()->id(), // El usuario que está registrando la compra
+                'movimiento' => 'entrada',
+                'cantidad' => $compra->cantidad,
+                'fecha_hora' => $compra->fecha_hora,
+                'descripcion' => "Compra ID: {$compra->id_compra}",
+            ]);
         }
     }
-
-    // ... (el resto de los métodos no los necesitamos por ahora)
 }

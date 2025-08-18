@@ -16,21 +16,26 @@ class MedidaProductoResource extends Resource
 {
     protected static ?string $model = MedidaProducto::class;
 
-    // --- CORRECCIÓN: Ícono cambiado de 'ruler' a 'scale' ---
-    protected static ?string $navigationIcon = 'heroicon-o-scale';
-
+    protected static ?string $navigationIcon = 'heroicon-o-beaker'; // Un ícono alternativo relacionado a medidas
     protected static ?string $modelLabel = 'Medida de Producto';
     protected static ?string $pluralModelLabel = 'Medidas de Productos';
     protected static ?string $navigationGroup = 'Catálogos';
-
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('nombre_unidad')->label('Nombre de la Medida')->required()->maxLength(255),
-                Forms\Components\TextInput::make('abreviatura')->label('Abreviatura')->required()->maxLength(10),
-                Forms\Components\Toggle::make('activo')->label('Activo')->default(true),
+                Forms\Components\TextInput::make('nombre_unidad')
+                    ->label('Nombre de la Medida')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('abreviatura')
+                    ->label('Abreviatura')
+                    ->required()
+                    ->maxLength(10),
+                Forms\Components\Toggle::make('activo')
+                    ->label('Activo')
+                    ->default(true),
             ]);
     }
 
@@ -40,7 +45,10 @@ class MedidaProductoResource extends Resource
             ->columns([
                 TextColumn::make('nombre_unidad')->label('Nombre')->searchable()->sortable(),
                 TextColumn::make('abreviatura')->searchable(),
-                IconColumn::make('activo')->label('Estado')->boolean()->sortable(),
+                IconColumn::make('activo')
+                    ->label('Estado')
+                    ->boolean()
+                    ->sortable(),
             ])
             ->filters([
                 //
@@ -54,6 +62,11 @@ class MedidaProductoResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [];
     }
 
     public static function getPages(): array

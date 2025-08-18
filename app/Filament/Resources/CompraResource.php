@@ -6,6 +6,8 @@ use App\Filament\Resources\CompraResource\Pages;
 use App\Models\Compra;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -22,18 +24,38 @@ class CompraResource extends Resource
 
     public static function form(Form $form): Form
     {
-        // ... (El formulario no cambia)
         return $form
             ->schema([
                 Forms\Components\Select::make('id_producto')->label('Producto')->relationship('producto', 'descripcion')->searchable()->required(),
                 Forms\Components\Select::make('id_proveedor')->label('Proveedor')->relationship('proveedor', 'nombre_proveedor')->searchable()->required(),
                 Forms\Components\DateTimePicker::make('fecha_hora')->label('Fecha y Hora de Compra')->required()->default(now()),
-                Forms\Components\TextInput::make('cantidad')->required()->numeric(),
-                Forms\Components\TextInput::make('precio_unitario')->label('Precio Unitario')->required()->numeric()->prefix('$ '),
-                Forms\Components\TextInput::make('total')->required()->numeric()->prefix('$ '),
+
+                // --- CAMPOS REACTIVOS CORREGIDOS ---
+                Forms\Components\TextInput::make('cantidad')
+                    ->required()
+                    ->numeric()
+                    ->minValue(1)
+                    ->live(onBlur: true) // Se actualiza al salir del campo
+                    ->afterStateUpdated(fn(Set $set, Get $get) => $set('total', ($get('cantidad') ?? 0) * ($get('precio_unitario') ?? 0))),
+
+                Forms\Components\TextInput::make('precio_unitario')
+                    ->label('Precio Unitario')
+                    ->required()
+                    ->numeric()
+                    ->prefix('$ ')
+                    ->live(onBlur: true) // Se actualiza al salir del campo
+                    ->afterStateUpdated(fn(Set $set, Get $get) => $set('total', ($get('cantidad') ?? 0) * ($get('precio_unitario') ?? 0))),
+
+                // El campo total ahora es de solo lectura y se rellena con la lógica de arriba.
+                Forms\Components\TextInput::make('total')
+                    ->required()
+                    ->numeric()
+                    ->prefix('$ ')
+                    ->readOnly(),
             ]);
     }
 
+    // El resto de la clase (table, etc.) se mantiene igual
     public static function table(Table $table): Table
     {
         return $table
@@ -44,14 +66,10 @@ class CompraResource extends Resource
                 Tables\Columns\TextColumn::make('total')->money('cop')->sortable(),
                 Tables\Columns\TextColumn::make('fecha_hora')->label('Fecha Compra')->dateTime()->sortable(),
             ])
-            ->filters([
-                //
-            ])
-            // --- ¡SECCIÓN MODIFICADA! ---
-            // Añadimos la acción de borrado junto a la de editar.
+            ->filters([])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(), // <-- ¡AQUÍ ESTÁ LA LÍNEA AÑADIDA!
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -60,7 +78,6 @@ class CompraResource extends Resource
             ]);
     }
 
-    // ... (El resto de los métodos no cambian)
     public static function getRelations(): array
     {
         return [];

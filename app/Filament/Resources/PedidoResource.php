@@ -23,7 +23,7 @@ class PedidoResource extends Resource
 
     public static function form(Form $form): Form
     {
-        // ... (El formulario no cambia)
+        // El método form() no cambia
         return $form
             ->schema([
                 Forms\Components\Select::make('id_producto')->label('Producto')->relationship('producto', 'descripcion')->searchable()->required(),
@@ -47,13 +47,14 @@ class PedidoResource extends Resource
                 Tables\Columns\TextColumn::make('total')->money('cop')->sortable(),
             ])
             ->filters([
-                SelectFilter::make('id_estado')->label('Filtrar por Estado')->relationship('estado', 'nombre_estado')
+                SelectFilter::make('id_estado')
+                    ->label('Filtrar por Estado')
+                    ->relationship('estado', 'nombre_estado')
             ])
-            // --- ¡SECCIÓN MODIFICADA! ---
-            // Añadimos la acción de borrado junto a la de editar.
+            // --- SECCIÓN CORREGIDA ---
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(), // <-- ¡AQUÍ ESTÁ LA LÍNEA AÑADIDA!
+                Tables\Actions\DeleteAction::make(), // <-- ¡ACCIÓN DE BORRAR AÑADIDA!
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -62,11 +63,11 @@ class PedidoResource extends Resource
             ]);
     }
 
-    // ... (El resto de los métodos no cambian)
     public static function getRelations(): array
     {
         return [];
     }
+
     public static function getPages(): array
     {
         return [

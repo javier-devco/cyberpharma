@@ -17,7 +17,6 @@ use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class VentaResource extends Resource
 {
-    // ... (El resto del Resource no cambia: form, actualizarTotal, etc.)
     protected static ?string $model = Venta::class;
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
     protected static ?string $modelLabel = 'Venta';
@@ -41,7 +40,21 @@ class VentaResource extends Resource
                                     $set('precio_unitario', Producto::find($state)?->precio_venta ?? 0);
                                     self::actualizarTotal($get, $set);
                                 }),
-                            Forms\Components\TextInput::make('cantidad')->numeric()->required()->default(1)->live()->afterStateUpdated(fn(Get $get, Set $set) => self::actualizarTotal($get, $set)),
+                            Forms\Components\TextInput::make('cantidad')
+                                ->numeric()->required()->default(1)->live()
+                                ->afterStateUpdated(fn(Get $get, Set $set) => self::actualizarTotal($get, $set))
+                                ->rules([
+                                    fn(Get $get): \Closure => function (string $attribute, $value, \Closure $fail) use ($get) {
+                                        $productoId = $get('id_producto');
+                                        if (!$productoId) {
+                                            return;
+                                        }
+                                        $producto = Producto::find($productoId);
+                                        if ($value > $producto->cantidad_stock) {
+                                            $fail("El stock de '{$producto->descripcion}' es solo de {$producto->cantidad_stock} unidades.");
+                                        }
+                                    },
+                                ]),
                             Forms\Components\TextInput::make('precio_unitario')->label('Precio Unitario')->numeric()->required()->prefix('COP')->live()->afterStateUpdated(fn(Get $get, Set $set) => self::actualizarTotal($get, $set)),
                         ])
                         ->columns(3)->reorderable(false)
@@ -75,11 +88,9 @@ class VentaResource extends Resource
                 Tables\Columns\TextColumn::make('total_venta')->label('Total')->money('cop')->sortable(),
             ])
             ->filters([])
-            // --- ¡SECCIÓN MODIFICADA! ---
-            // Añadimos la acción de borrado junto a la de editar.
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(), // <-- ¡AQUÍ ESTÁ LA LÍNEA AÑADIDA!
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

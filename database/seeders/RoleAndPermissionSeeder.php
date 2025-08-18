@@ -3,60 +3,64 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class RoleAndPermissionSeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     */
     public function run(): void
     {
-        // Crear Permisos agrupados por módulo para mayor orden
-        // ----------------------------------------------------
+        // Limpiar caché de permisos de Spatie
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // Permisos para el módulo de Usuarios
-        Permission::create(['name' => 'ver usuarios']);
-        Permission::create(['name' => 'crear usuarios']);
-        Permission::create(['name' => 'editar usuarios']);
-        Permission::create(['name' => 'borrar usuarios']);
+        // --- CREACIÓN DE PERMISOS ---
+        // (nombre clave, grupo, descripción legible)
 
-        // Permisos para el módulo de Roles
-        Permission::create(['name' => 'ver roles']);
-        Permission::create(['name' => 'crear roles']);
-        Permission::create(['name' => 'editar roles']);
-        Permission::create(['name' => 'borrar roles']);
+        // Permiso Maestro
+        Permission::create(['name' => 'acceso_panel_admin', 'group_name' => 'panel', 'description' => 'Permitir acceso al panel de administración']);
 
-        // Permisos para el módulo de Productos
-        Permission::create(['name' => 'ver productos']);
-        Permission::create(['name' => 'crear productos']);
-        Permission::create(['name' => 'editar productos']);
-        Permission::create(['name' => 'borrar productos']);
+        // Permisos para el Módulo de Roles
+        Permission::create(['name' => 'ver_roles', 'group_name' => 'roles', 'description' => 'Ver listado de Roles y Permisos']);
+        Permission::create(['name' => 'crear_roles', 'group_name' => 'roles', 'description' => 'Crear nuevos Roles']);
+        Permission::create(['name' => 'editar_roles', 'group_name' => 'roles', 'description' => 'Editar Roles y Permisos']);
+        Permission::create(['name' => 'borrar_roles', 'group_name' => 'roles', 'description' => 'Borrar Roles']);
 
-        // ... puedes añadir más permisos para proveedores, ventas, etc.
+        // Permisos para el Módulo de Productos/Inventario
+        Permission::create(['name' => 'ver_inventario', 'group_name' => 'inventario', 'description' => 'Ver Inventario']);
+        Permission::create(['name' => 'crear_productos', 'group_name' => 'inventario', 'description' => 'Crear Productos']);
+        Permission::create(['name' => 'editar_productos', 'group_name' => 'inventario', 'description' => 'Editar Productos']);
+        Permission::create(['name' => 'borrar_productos', 'group_name' => 'inventario', 'description' => 'Borrar Productos']);
 
-        // Crear Roles y asignarles permisos
-        // -------------------------------------
+        // Permisos para el Módulo de Ventas
+        Permission::create(['name' => 'ver_ventas', 'group_name' => 'ventas', 'description' => 'Ver listado de Ventas']);
+        Permission::create(['name' => 'crear_ventas', 'group_name' => 'ventas', 'description' => 'Crear nuevas Ventas']);
 
-        // Rol de Administrador (acceso a todo)
-        $adminRole = Role::create(['name' => 'Administrador']);
-        $adminRole->givePermissionTo(Permission::all()); // Asigna todos los permisos
 
-        // Rol de Regente
-        $regenteRole = Role::create(['name' => 'Regente']);
-        $regenteRole->givePermissionTo([
-            'ver productos',
-            'editar productos',
-            'ver usuarios', // Por ejemplo, un regente puede ver usuarios pero no crearlos
+        // --- CREACIÓN DE ROLES ---
+        $rolAdmin = Role::create(['name' => 'Administrador']);
+        $rolVendedor = Role::create(['name' => 'Vendedor']);
+        $rolBodeguero = Role::create(['name' => 'Bodeguero']);
+
+        // --- ASIGNACIÓN DE PERMISOS A ROLES ---
+
+        // El Administrador tiene todos los permisos
+        $rolAdmin->syncPermissions(Permission::all());
+
+        // El Vendedor solo puede acceder, ver inventario y crear ventas
+        $rolVendedor->syncPermissions([
+            'acceso_panel_admin',
+            'ver_inventario',
+            'crear_ventas'
         ]);
 
-        // Rol de Bodega
-        $bodegaRole = Role::create(['name' => 'Bodega']);
-        $bodegaRole->givePermissionTo('ver productos'); // Solo puede ver productos
-
-        // Rol de Venta
-        $ventaRole = Role::create(['name' => 'Venta']);
-        $ventaRole->givePermissionTo([
-            'ver productos',
-            // ... y permisos de ventas cuando los crees
+        // El Bodeguero puede acceder y gestionar el inventario
+        $rolBodeguero->syncPermissions([
+            'acceso_panel_admin',
+            'ver_inventario',
+            'editar_productos'
         ]);
     }
 }

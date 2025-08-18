@@ -4,32 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class MedidaProducto extends Model
 {
     use HasFactory;
 
-    // --- Propiedades de Configuración del Modelo ---
-
-    /**
-     * La tabla asociada con el modelo.
-     */
     protected $table = 'medidas_productos';
-
-    /**
-     * La clave primaria para el modelo (soluciona el error 'id' not found).
-     */
     protected $primaryKey = 'id_medida';
 
     /**
-     * Indica si el modelo debe tener timestamps (created_at y updated_at).
-     */
-    public $timestamps = true;
-
-    /**
-     * Los atributos que se pueden asignar masivamente.
-     * (Se ha combinado la información y eliminado la declaración duplicada).
+     * ¡CÓDIGO CORREGIDO!
+     * Añadimos 'abreviatura' y 'activo' para permitir que se guarden
+     * desde el formulario.
      */
     protected $fillable = [
         'nombre_unidad',
@@ -38,20 +24,13 @@ class MedidaProducto extends Model
     ];
 
     /**
-     * Los atributos que deben ser convertidos a tipos nativos.
-     * (¡Excelente práctica usar esto para el campo 'activo'!).
+     * Le decimos a Laravel que el campo 'activo' debe ser tratado
+     * como un booleano (verdadero/falso).
      */
-    protected $casts = [
-        'activo' => 'boolean',
-    ];
-
-    // --- Relaciones del Modelo ---
-
-    /**
-     * Define la relación donde una Medida puede tener muchos Productos.
-     */
-    public function productos(): HasMany
+    protected function casts(): array
     {
-        return $this->hasMany(Producto::class, 'id_medida', 'id_medida');
+        return [
+            'activo' => 'boolean',
+        ];
     }
 }
